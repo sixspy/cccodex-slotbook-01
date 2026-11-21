@@ -7,11 +7,12 @@ export const confirmViewTemplate = `
     </div>
     <p class="err" v-if="actionErr">{{ actionErr }}</p>
     <table>
-      <thead><tr><th>ID</th><th>档</th><th>当事人</th><th>席</th><th>快照代</th><th>态</th></tr></thead>
+      <thead><tr><th>ID</th><th>档</th><th>当事人</th><th>席</th><th>快照代</th><th>态</th><th></th></tr></thead>
       <tbody>
         <tr v-for="b in bookings" :key="b.id">
           <td>{{ b.id }}</td><td>{{ b.slot_code }}</td><td>{{ b.party_key }}</td>
           <td>{{ b.seats }}</td><td>{{ b.snapshot_gen }}</td><td>{{ b.status }}</td>
+          <td><button class="ghost" v-if="b.status==='已确认'" @click="doRelease(b.id)">释放还席</button></td>
         </tr>
       </tbody>
     </table>

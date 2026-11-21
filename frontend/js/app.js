@@ -74,6 +74,10 @@ createApp({
       try { actionErr.value = ""; await api.post("/api/bookings/confirm", { hold_id: confirmId.value }); await refresh(); }
       catch (e) { actionErr.value = e.message; }
     }
+    async function doRelease(id) {
+      try { actionErr.value = ""; await api.post("/api/release", { booking_id: id, note: "界面释放还席" }); await refresh(); }
+      catch (e) { actionErr.value = e.message; }
+    }
     async function promoteWait(id) {
       try { actionErr.value = ""; await api.post("/api/waitlist/promote", { wait_id: id }); await refresh(); }
       catch (e) { actionErr.value = e.message; }
@@ -84,7 +88,7 @@ createApp({
     return {
       token, user, username, password, err, actionErr, tab, nav,
       slots, holds, waitlist, bookings, recon, audits, contention, dash,
-      holdForm, confirmId, login, logout, refresh, doHold, doConfirm, promoteWait,
+      holdForm, confirmId, login, logout, refresh, doHold, doConfirm, doRelease, promoteWait,
     };
   },
   template: `

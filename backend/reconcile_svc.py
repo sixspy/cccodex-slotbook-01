@@ -21,12 +21,18 @@ def reconcile_all(authorization: AuthHeader = None):
                    WHERE slot_id=? AND status='已确认'""",
                 (s["id"],),
             ).fetchone()["s"]
+            released_sum = conn.execute(
+                """SELECT COALESCE(SUM(seats),0) s FROM bookings
+                   WHERE slot_id=? AND status='已作废'""",
+                (s["id"],),
+            ).fetchone()["s"]
             ok = int(booked_sum) == int(s["booked"])
             items.append(
                 {
                     "slot_code": s["code"],
                     "slot_booked": s["booked"],
                     "booking_seats": booked_sum,
+                    "released_seats": released_sum,
                     "generation": s["generation"],
                     "ok": ok,
                     "status": s["status"],
@@ -47,6 +53,11 @@ def reconcile_one(code: str, authorization: AuthHeader = None):
                WHERE slot_id=? AND status='已确认'""",
             (s["id"],),
         ).fetchone()["s"]
+        released_sum = conn.execute(
+            """SELECT COALESCE(SUM(seats),0) s FROM bookings
+               WHERE slot_id=? AND status='已作废'""",
+            (s["id"],),
+        ).fetchone()["s"]
         holds = conn.execute(
             "SELECT COUNT(*) c FROM holds WHERE slot_id=? AND status='占位中'",
             (s["id"],),
@@ -55,6 +66,7 @@ def reconcile_one(code: str, authorization: AuthHeader = None):
             "slot_code": code,
             "slot_booked": s["booked"],
             "booking_seats": booked_sum,
+            "released_seats": released_sum,
             "open_holds": holds,
             "ok": int(booked_sum) == int(s["booked"]),
             "generation": s["generation"],

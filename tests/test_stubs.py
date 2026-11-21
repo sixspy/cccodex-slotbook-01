@@ -1,4 +1,8 @@
-"""空桩可点：release / transfer 登记任务但不改正式册。"""
+"""空桩可点：transfer 登记任务但不改正式册。
+
+release 已在 tests/test_release.py 按甲路径落地（整笔事务释放还席），
+旧的 release 空桩测试随之移除。
+"""
 from __future__ import annotations
 
 import sys
@@ -28,19 +32,6 @@ def _fresh_db(tmp_path, monkeypatch):
 def _login(c):
     r = c.post("/api/login", json={"username": "admin", "password": "123456"})
     return {"Authorization": f"Bearer {r.json()['token']}"}
-
-
-def test_release_stub():
-    with TestClient(app) as c:
-        h = _login(c)
-        books = c.get("/api/bookings", headers=h).json()["items"]
-        assert books
-        r = c.post("/api/release", headers=h, json={"booking_id": books[0]["id"]})
-        assert r.status_code == 200
-        assert r.json()["stub"] is True
-        # 正式册未变
-        books2 = c.get("/api/bookings", headers=h).json()["items"]
-        assert books2[0]["status"] == "已确认"
 
 
 def test_transfer_stub():
